@@ -1,0 +1,18 @@
+<div class="login-page">
+  <h1>e-ÉtatCivil</h1>
+  <form (ngSubmit)="onSubmit()">
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+    <label>
+      Mot de passe
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </label>
+    <button type="submit">Se connecter</button>
+    @if (erreur()) {
+      <p class="erreur">{{ erreur() }}</p>
+    }
+  </form>
+  <a routerLink="/register">Créer un compte citoyen</a>
+</div>

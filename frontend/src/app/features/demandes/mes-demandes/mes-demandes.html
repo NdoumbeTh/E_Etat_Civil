@@ -1,0 +1,40 @@
+<div class="mes-demandes">
+  <header>
+    <h1>Mes demandes</h1>
+    <a routerLink="/demandes/nouvelle">+ Nouvelle demande</a>
+  </header>
+
+  @if (chargement()) {
+    <p>Chargement...</p>
+  } @else if (demandes().length === 0) {
+    <p>Aucune demande pour le moment.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Type d'acte</th>
+          <th>Statut</th>
+          <th>Déposée le</th>
+          <th>Pièces</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (demande of demandes(); track demande.id) {
+          <tr [class]="'statut-' + demande.statut.toLowerCase()">
+            <td>{{ demande.typeActeLibelle }}</td>
+            <td>
+              {{ libelleStatut(demande.statut) }}
+              @if (demande.statut === 'REJETEE' && demande.motifRejet) {
+                <div class="motif">{{ demande.motifRejet }}</div>
+              }
+            </td>
+            <td>{{ demande.dateDepot | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ demande.pieces.length }} fichier(s)</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <a routerLink="/dashboard">Retour au tableau de bord</a>
+</div>

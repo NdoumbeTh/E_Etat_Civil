@@ -1,0 +1,60 @@
+<div class="traiter-demande">
+  @if (chargement()) {
+    <p>Chargement...</p>
+  } @else if (!demande()) {
+    <p>Demande introuvable.</p>
+  } @else {
+    <h1>Demande #{{ demande()!.id }} — {{ demande()!.typeActeLibelle }}</h1>
+    <p class="statut">Statut actuel : {{ demande()!.statut }}</p>
+
+    <section class="infos-demandeur">
+      <h2>Informations du demandeur</h2>
+      <ul>
+        @for (cle of ['nom', 'dateNaissance', 'lieuNaissance']; track cle) {
+          @if (infos[cle]) {
+            <li><strong>{{ cle }}</strong> : {{ infos[cle] }}</li>
+          }
+        }
+      </ul>
+    </section>
+
+    <section class="pieces">
+      <h2>Pièces justificatives</h2>
+      @if (demande()!.pieces.length === 0) {
+        <p>Aucune pièce jointe.</p>
+      } @else {
+        <ul>
+          @for (piece of demande()!.pieces; track piece.id) {
+            <li><a [href]="apiOrigin + piece.url" target="_blank" rel="noopener">{{ piece.nomFichier }}</a></li>
+          }
+        </ul>
+      }
+    </section>
+
+    @if (demande()!.statut === 'DEPOSEE' || demande()!.statut === 'EN_TRAITEMENT') {
+      <section class="decision">
+        <h2>Décision</h2>
+        <button type="button" (click)="valider()" [disabled]="enCours()">Valider la demande</button>
+
+        <div class="rejet">
+          <label>
+            Motif de rejet (obligatoire pour rejeter)
+            <textarea [(ngModel)]="motif" rows="3"></textarea>
+          </label>
+          <button type="button" (click)="rejeter()" [disabled]="enCours()">Rejeter la demande</button>
+        </div>
+
+        @if (erreur()) {
+          <p class="erreur">{{ erreur() }}</p>
+        }
+      </section>
+    } @else {
+      <p>Cette demande a déjà été traitée ({{ demande()!.statut }}).</p>
+      @if (demande()!.motifRejet) {
+        <p class="motif">Motif : {{ demande()!.motifRejet }}</p>
+      }
+    }
+  }
+
+  <a routerLink="/officier/demandes">Retour à la liste</a>
+</div>

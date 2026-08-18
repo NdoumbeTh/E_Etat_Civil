@@ -1,0 +1,43 @@
+<div class="demandes-a-traiter">
+  <header>
+    <h1>Demandes à traiter</h1>
+    <button type="button" (click)="basculerFiltre()">
+      {{ filtre() === 'A_TRAITER' ? 'Voir toutes les demandes' : 'Voir seulement à traiter' }}
+    </button>
+  </header>
+
+  @if (chargement()) {
+    <p>Chargement...</p>
+  } @else if (demandesFiltrees.length === 0) {
+    <p>Aucune demande à traiter pour le moment.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Type d'acte</th>
+          <th>Statut</th>
+          <th>Déposée le</th>
+          <th>Pièces</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (demande of demandesFiltrees; track demande.id) {
+          <tr [class]="'statut-' + demande.statut.toLowerCase()">
+            <td>{{ demande.id }}</td>
+            <td>{{ demande.typeActeLibelle }}</td>
+            <td>{{ libelleStatut(demande.statut) }}</td>
+            <td>{{ demande.dateDepot | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ demande.pieces.length }} fichier(s)</td>
+            <td>
+              <a [routerLink]="['/officier/demandes', demande.id]">Instruire</a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <a routerLink="/dashboard">Retour au tableau de bord</a>
+</div>

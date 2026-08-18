@@ -1,0 +1,26 @@
+<div class="dashboard">
+  <header>
+    <h1>Tableau de bord</h1>
+    <button (click)="logout()">Déconnexion</button>
+  </header>
+
+  @switch (auth.role()) {
+    @case ('CITOYEN') {
+  <p>Bienvenue citoyen — retrouvez ici vos demandes d'actes.</p>
+  <a routerLink="/demandes">Voir mes demandes</a>
+}
+    @case ('OFFICIER') {
+  <p>Bienvenue officier — file d'instruction des demandes.</p>
+  <a routerLink="/officier/demandes">Voir les demandes à traiter</a>
+}
+    @case ('CHEF_SERVICE') {
+      <p>Bienvenue chef de service — statistiques et délais (Module 3, Séance 5).</p>
+    }
+    @case ('ADMIN') {
+      <p>Bienvenue admin — gestion des comptes et types d'actes.</p>
+    }
+    @default {
+      <p>Rôle inconnu.</p>
+    }
+  }
+</div>

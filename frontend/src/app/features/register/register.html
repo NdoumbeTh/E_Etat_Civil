@@ -1,0 +1,22 @@
+<div class="register-page">
+  <h1>Créer un compte citoyen</h1>
+  <form (ngSubmit)="onSubmit()">
+    <label>
+      Nom complet
+      <input type="text" name="nom" [(ngModel)]="nom" required />
+    </label>
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+    <label>
+      Mot de passe
+      <input type="password" name="password" [(ngModel)]="password" required minlength="6" />
+    </label>
+    <button type="submit">Créer mon compte</button>
+    @if (erreur()) {
+      <p class="erreur">{{ erreur() }}</p>
+    }
+  </form>
+  <a routerLink="/login">J'ai déjà un compte</a>
+</div>

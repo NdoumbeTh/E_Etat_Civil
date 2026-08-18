@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: etatcivil-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: etatcivil
+      POSTGRES_USER: etatcivil
+      POSTGRES_PASSWORD: etatcivil
+    ports:
+      - "5432:5432"
+    volumes:
+      - etatcivil-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  etatcivil-postgres-data:

@@ -1,0 +1,48 @@
+<div class="nouvelle-demande">
+  <h1>Nouvelle demande d'acte</h1>
+
+  <form (ngSubmit)="onSubmit()">
+    <label>
+      Type d'acte
+      <select name="typeActeId" [(ngModel)]="typeActeId" required>
+        @for (type of typesActes(); track type.id) {
+          <option [value]="type.id">{{ type.libelle }}</option>
+        }
+      </select>
+    </label>
+
+    @if (typeSelectionne) {
+      <p class="pieces-requises">Pièces requises : {{ typeSelectionne.piecesRequises }}</p>
+    }
+
+    <label>
+      Nom complet du demandeur
+      <input type="text" name="nom" [(ngModel)]="nom" required />
+    </label>
+
+    <label>
+      Date de naissance
+      <input type="date" name="dateNaissance" [(ngModel)]="dateNaissance" required />
+    </label>
+
+    <label>
+      Lieu de naissance
+      <input type="text" name="lieuNaissance" [(ngModel)]="lieuNaissance" required />
+    </label>
+
+    <label>
+      Pièces justificatives (PDF, images)
+      <input type="file" multiple (change)="onFichiersChange($event)" />
+    </label>
+
+    <button type="submit" [disabled]="enCours()">
+      {{ enCours() ? 'Envoi en cours...' : 'Soumettre la demande' }}
+    </button>
+
+    @if (erreur()) {
+      <p class="erreur">{{ erreur() }}</p>
+    }
+  </form>
+
+  <a routerLink="/demandes">Retour à mes demandes</a>
+</div>
