@@ -8,8 +8,8 @@ RUN npm run build -- --configuration production
 
 # --- Stage 2 : runtime ---
 FROM nginx:alpine
-# Adapter <nom-projet-angular> au dossier réellement généré dans dist/
-COPY --from=build /app/dist/e-etatcivil-frontend/browser /usr/share/nginx/html
+# Nom du projet Angular = "frontend" (voir angular.json) -> dist/frontend/browser
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

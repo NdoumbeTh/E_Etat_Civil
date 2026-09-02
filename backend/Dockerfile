@@ -1,12 +1,8 @@
 # --- Stage 1 : build ---
 FROM gradle:8-jdk21 AS build
 WORKDIR /app
-COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-COPY gradlew ./
-RUN chmod +x gradlew
-COPY src ./src
-RUN ./gradlew bootJar --no-daemon -x test
+COPY . .
+RUN gradle bootJar --no-daemon -x test
 
 # --- Stage 2 : runtime ---
 FROM eclipse-temurin:21-jre-alpine
