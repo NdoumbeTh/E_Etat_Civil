@@ -1,1 +1,757 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   e-ÉtatCivil — design system global
+   ========================================================================== */
+
+:root {
+  --color-primary: #123a63;
+  --color-primary-dark: #0a2440;
+  --color-primary-light: #2c5c93;
+  --color-accent: #c7a13a;
+  --color-accent-dark: #a3831f;
+  --color-accent-light: #e7d193;
+
+  --color-success: #1e7d4f;
+  --color-success-bg: #e7f5ed;
+  --color-success-border: #b7e2c8;
+
+  --color-warning: #a8710c;
+  --color-warning-bg: #fbf1dc;
+  --color-warning-border: #f0d99a;
+
+  --color-danger: #a4231c;
+  --color-danger-bg: #fbeae9;
+  --color-danger-border: #f0c0bc;
+
+  --color-info: #2c5c93;
+  --color-info-bg: #e9f0f9;
+  --color-info-border: #c3d7ee;
+
+  --color-bg: #eef1f6;
+  --color-surface: #ffffff;
+  --color-border: #dbe1ea;
+  --color-text: #172433;
+  --color-text-muted: #5b6b7d;
+  --color-text-soft: #8593a3;
+
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(10, 30, 55, 0.06), 0 1px 1px rgba(10, 30, 55, 0.04);
+  --shadow-md: 0 10px 24px -8px rgba(10, 30, 55, 0.18);
+  --shadow-lg: 0 24px 60px -12px rgba(10, 30, 55, 0.28);
+
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --content-width: 960px;
+}
+
+/* --------------------------------------------------------------------------
+   Reset & base
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(199, 161, 58, 0.08), transparent 60%),
+    radial-gradient(1200px 600px at -10% 0%, rgba(18, 58, 99, 0.06), transparent 55%),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.6em;
+  letter-spacing: 0.01em;
+}
+
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.05rem; }
+
+p { margin: 0 0 1em; }
+
+ul { margin: 0; padding: 0; }
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover { color: var(--color-accent-dark); }
+
+button {
+  font-family: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   Primitives — buttons, links-as-actions
+   -------------------------------------------------------------------------- */
+
+button[type='submit'],
+button:not([type]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.75em 1.6em;
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--color-primary-light), var(--color-primary));
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+}
+
+button[type='submit']:hover:not(:disabled),
+button:not([type]):hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Top-level "next step" links — direct children of a page wrapper act as
+   secondary pill buttons (back links, "voir mes demandes", etc.) */
+.login-page > a,
+.register-page > a,
+.dashboard > a,
+.mes-demandes > a,
+.nouvelle-demande > a,
+.demandes-a-traiter > a,
+.traiter-demande > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 1.75rem;
+  padding: 0.6em 1.3em;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition), color var(--transition), transform var(--transition);
+}
+
+.login-page > a::before,
+.register-page > a::before { content: '\2192'; }
+
+.mes-demandes > a::before,
+.nouvelle-demande > a::before,
+.demandes-a-traiter > a::before,
+.traiter-demande > a::before { content: '\2190'; }
+
+.dashboard > a::after { content: '\2192'; }
+
+.login-page > a:hover,
+.register-page > a:hover,
+.dashboard > a:hover,
+.mes-demandes > a:hover,
+.nouvelle-demande > a:hover,
+.demandes-a-traiter > a:hover,
+.traiter-demande > a:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
+  transform: translateX(2px);
+}
+
+/* Header action links/buttons (dashboard logout, +Nouvelle demande, filtre) */
+header a,
+header button {
+  margin-top: 0;
+}
+
+header a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.6em 1.25em;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), transform var(--transition);
+}
+
+header a:hover {
+  background: var(--color-primary-dark);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+header button[type='button'] {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-primary);
+  box-shadow: none;
+}
+
+header button[type='button']:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
+  filter: none;
+}
+
+/* --------------------------------------------------------------------------
+   Forms
+   -------------------------------------------------------------------------- */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-text);
+  background: #fbfcfe;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75em 0.9em;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 5em;
+}
+
+input:hover, select:hover, textarea:hover {
+  border-color: var(--color-primary-light);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(18, 58, 99, 0.1);
+}
+
+input[type='file'] {
+  padding: 0.6em;
+  background: var(--color-info-bg);
+  border-style: dashed;
+  border-color: var(--color-info-border);
+  cursor: pointer;
+}
+
+input[type='file']::file-selector-button {
+  font-family: inherit;
+  font-weight: 600;
+  padding: 0.5em 1em;
+  margin-right: 0.9em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+input[type='file']::file-selector-button:hover {
+  background: var(--color-primary-dark);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-primary) 50%),
+    linear-gradient(135deg, var(--color-primary) 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.2em;
+}
+
+/* --------------------------------------------------------------------------
+   Feedback — errors, notes, status text
+   -------------------------------------------------------------------------- */
+
+.erreur {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0;
+  padding: 0.85em 1.1em;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.erreur::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3em;
+  height: 1.3em;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.pieces-requises {
+  margin: -0.4rem 0 0;
+  padding: 0.8em 1.1em;
+  border-radius: var(--radius-sm);
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info);
+  font-size: 0.88rem;
+}
+
+.motif {
+  margin-top: 0.35em;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-danger);
+}
+
+/* --------------------------------------------------------------------------
+   Auth pages — login / register
+   -------------------------------------------------------------------------- */
+
+.login-page,
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  position: relative;
+}
+
+.login-page::before,
+.register-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-primary) 46%, var(--color-bg) 46%);
+  z-index: -1;
+}
+
+.login-page > h1,
+.register-page > h1 {
+  color: #fff;
+  font-size: 2.1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.login-page > h1::before,
+.register-page > h1::before {
+  content: '';
+  display: inline-block;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  background: radial-gradient(circle at 35% 30%, var(--color-accent-light), var(--color-accent) 70%);
+  box-shadow: 0 0 0 4px rgba(199, 161, 58, 0.18);
+}
+
+.login-page > form,
+.register-page > form {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border-top: 4px solid var(--color-accent);
+  padding: 2.4rem 2.2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-page > form button[type='submit'],
+.register-page > form button[type='submit'] {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.85em 1.6em;
+}
+
+.login-page > form .erreur,
+.register-page > form .erreur {
+  margin-top: 0.2rem;
+}
+
+.login-page > a,
+.register-page > a {
+  margin-top: 1.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+  backdrop-filter: blur(2px);
+}
+
+.login-page > a:hover,
+.register-page > a:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-light);
+}
+
+/* --------------------------------------------------------------------------
+   App pages shared shell (dashboard, listes, formulaires, instruction)
+   -------------------------------------------------------------------------- */
+
+.dashboard,
+.mes-demandes,
+.nouvelle-demande,
+.demandes-a-traiter,
+.traiter-demande {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 2.5rem 1.75rem 4rem;
+}
+
+.dashboard > header,
+.mes-demandes > header,
+.demandes-a-traiter > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1.4rem;
+  margin-bottom: 1.8rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard > header::before,
+.mes-demandes > header::before,
+.demandes-a-traiter > header::before {
+  content: 'RÉPUBLIQUE — SERVICE DE L\2019ÉTAT CIVIL';
+  position: absolute;
+  margin-top: -3.5rem;
+}
+
+.dashboard > header h1,
+.mes-demandes > header h1,
+.demandes-a-traiter > header h1 {
+  margin: 0;
+}
+
+/* Dashboard welcome card */
+.dashboard > p {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--color-accent);
+  padding: 1.6rem 1.8rem;
+  box-shadow: var(--shadow-sm);
+  font-size: 1.02rem;
+  color: var(--color-text);
+  max-width: 640px;
+}
+
+/* nouvelle-demande / traiter-demande as a single elevated card */
+.nouvelle-demande,
+.traiter-demande {
+  max-width: 720px;
+}
+
+.nouvelle-demande > form {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border-top: 4px solid var(--color-accent);
+  padding: 2.2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.traiter-demande > h1 {
+  margin-bottom: 0.3rem;
+}
+
+.traiter-demande > .statut {
+  display: inline-block;
+  margin-bottom: 1.8rem;
+  padding: 0.35em 1em;
+  border-radius: var(--radius-pill);
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.traiter-demande > section {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 1.7rem 1.9rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+.traiter-demande > section h2 {
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.infos-demandeur ul,
+.pieces ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.infos-demandeur li {
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.infos-demandeur li strong {
+  display: inline-block;
+  min-width: 9.5rem;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.pieces li a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.9em;
+  border-radius: var(--radius-sm);
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info);
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.pieces li a::before { content: '\1F4CE'; }
+
+.pieces li a:hover {
+  background: var(--color-info-border);
+}
+
+.decision {
+  border-color: var(--color-accent-light) !important;
+}
+
+.decision button[type='button'] {
+  background: linear-gradient(180deg, #2a9163, var(--color-success));
+}
+
+.decision > .rejet {
+  margin-top: 1.4rem;
+  padding-top: 1.4rem;
+  border-top: 1px dashed var(--color-border);
+}
+
+.decision > .rejet button[type='button'] {
+  margin-top: 0.9rem;
+  background: linear-gradient(180deg, #c23931, var(--color-danger));
+}
+
+.decision > .erreur {
+  margin-top: 1rem;
+}
+
+.traiter-demande > p.motif {
+  font-size: 0.95rem;
+}
+
+/* --------------------------------------------------------------------------
+   Tables — mes-demandes / demandes-a-traiter
+   -------------------------------------------------------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+thead th {
+  text-align: left;
+  padding: 0.9em 1.1em;
+  background: var(--color-primary-dark);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+tbody td {
+  padding: 0.95em 1.1em;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.92rem;
+  vertical-align: middle;
+}
+
+tbody tr {
+  border-left: 4px solid transparent;
+  transition: background var(--transition);
+}
+
+tbody tr:hover {
+  background: #f5f8fb;
+}
+
+tbody tr td:first-child {
+  font-weight: 600;
+}
+
+tbody tr.statut-deposee { border-left-color: var(--color-info); }
+tbody tr.statut-en_traitement { border-left-color: var(--color-warning); }
+tbody tr.statut-validee { border-left-color: var(--color-success); }
+tbody tr.statut-rejetee { border-left-color: var(--color-danger); }
+
+.mes-demandes tbody tr.statut-deposee td:nth-child(2),
+.demandes-a-traiter tbody tr.statut-deposee td:nth-child(3) {
+  color: var(--color-info);
+  font-weight: 600;
+}
+
+.mes-demandes tbody tr.statut-en_traitement td:nth-child(2),
+.demandes-a-traiter tbody tr.statut-en_traitement td:nth-child(3) {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.mes-demandes tbody tr.statut-validee td:nth-child(2),
+.demandes-a-traiter tbody tr.statut-validee td:nth-child(3) {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.mes-demandes tbody tr.statut-rejetee td:nth-child(2),
+.demandes-a-traiter tbody tr.statut-rejetee td:nth-child(3) {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+table td a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.4em 0.95em;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+table td a:hover {
+  background: var(--color-primary-dark);
+  color: #fff;
+}
+
+/* Empty / loading states */
+.mes-demandes > p,
+.demandes-a-traiter > p {
+  padding: 2.5rem;
+  text-align: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  h1 { font-size: 1.5rem; }
+
+  .login-page > form,
+  .register-page > form {
+    padding: 1.8rem 1.4rem;
+  }
+
+  .dashboard,
+  .mes-demandes,
+  .nouvelle-demande,
+  .demandes-a-traiter,
+  .traiter-demande {
+    padding: 1.75rem 1.1rem 3rem;
+  }
+
+  .nouvelle-demande > form {
+    padding: 1.5rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .infos-demandeur li strong {
+    display: block;
+    min-width: 0;
+  }
+}

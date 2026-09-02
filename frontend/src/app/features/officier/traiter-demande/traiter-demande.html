@@ -8,15 +8,13 @@
     <p class="statut">Statut actuel : {{ demande()!.statut }}</p>
 
     <section class="infos-demandeur">
-      <h2>Informations du demandeur</h2>
-      <ul>
-        @for (cle of ['nom', 'dateNaissance', 'lieuNaissance']; track cle) {
-          @if (infos[cle]) {
-            <li><strong>{{ cle }}</strong> : {{ infos[cle] }}</li>
-          }
-        }
-      </ul>
-    </section>
+  <h2>Informations du demandeur</h2>
+  <ul>
+    @for (entree of infosEntries; track entree[0]) {
+      <li><strong>{{ entree[0] }}</strong> : {{ entree[1] }}</li>
+    }
+  </ul>
+</section>
 
     <section class="pieces">
       <h2>Pièces justificatives</h2>

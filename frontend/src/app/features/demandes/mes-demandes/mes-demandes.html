@@ -20,7 +20,7 @@
       </thead>
       <tbody>
         @for (demande of demandes(); track demande.id) {
-          <tr [class]="'statut-' + demande.statut.toLowerCase()">
+          <tr [class]="'statut-' + demande.statut.toLowerCase()" [routerLink]="['/demandes', demande.id]" style="cursor: pointer;">
             <td>{{ demande.typeActeLibelle }}</td>
             <td>
               {{ libelleStatut(demande.statut) }}

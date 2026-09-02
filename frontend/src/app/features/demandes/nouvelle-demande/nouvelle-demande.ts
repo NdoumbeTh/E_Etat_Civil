@@ -6,6 +6,38 @@ import { TypeActeService } from '../../../core/services/type-acte.service';
 import { DemandeActeService } from '../../../core/services/demande-acte.service';
 import { TypeActe } from '../../../core/models/demande-acte.model';
 
+interface ChampFormulaire {
+  key: string;
+  label: string;
+  type: 'text' | 'date';
+}
+
+const CHAMPS_PAR_TYPE: Record<string, ChampFormulaire[]> = {
+  NAISSANCE: [
+    { key: 'nomEnfant', label: "Nom complet de l'enfant", type: 'text' },
+    { key: 'dateNaissance', label: 'Date de naissance', type: 'date' },
+    { key: 'lieuNaissance', label: 'Lieu de naissance', type: 'text' },
+    { key: 'nomPere', label: 'Nom du père', type: 'text' },
+    { key: 'nomMere', label: 'Nom de la mère', type: 'text' },
+  ],
+  MARIAGE: [
+    { key: 'nomEpoux', label: "Nom complet de l'époux", type: 'text' },
+    { key: 'nomEpouse', label: "Nom complet de l'épouse", type: 'text' },
+    { key: 'dateMariage', label: 'Date du mariage', type: 'date' },
+    { key: 'lieuMariage', label: 'Lieu du mariage', type: 'text' },
+  ],
+  DECES: [
+    { key: 'nomDefunt', label: 'Nom complet du défunt', type: 'text' },
+    { key: 'dateDeces', label: 'Date du décès', type: 'date' },
+    { key: 'lieuDeces', label: 'Lieu du décès', type: 'text' },
+    { key: 'nomDeclarant', label: 'Nom du déclarant', type: 'text' },
+  ],
+};
+
+const CHAMPS_PAR_DEFAUT: ChampFormulaire[] = [
+  { key: 'nom', label: 'Nom complet', type: 'text' },
+];
+
 @Component({
   selector: 'app-nouvelle-demande',
   standalone: true,
@@ -15,9 +47,7 @@ import { TypeActe } from '../../../core/models/demande-acte.model';
 export class NouvelleDemande implements OnInit {
   typesActes = signal<TypeActe[]>([]);
   typeActeId: number | null = null;
-  nom = '';
-  dateNaissance = '';
-  lieuNaissance = '';
+  formData: Record<string, string> = {};
   fichiers: File[] = [];
   enCours = signal(false);
   erreur = signal<string | null>(null);
@@ -31,12 +61,28 @@ export class NouvelleDemande implements OnInit {
   ngOnInit(): void {
     this.typeActeService.lister().subscribe((types) => {
       this.typesActes.set(types);
-      if (types.length) this.typeActeId = types[0].id;
+      if (types.length) {
+        this.typeActeId = types[0].id;
+        this.onTypeChange();
+      }
     });
   }
 
   get typeSelectionne(): TypeActe | undefined {
     return this.typesActes().find((t) => t.id === this.typeActeId);
+  }
+
+  get champsActuels(): ChampFormulaire[] {
+    const libelle = this.typeSelectionne?.libelle ?? '';
+    return CHAMPS_PAR_TYPE[libelle] ?? CHAMPS_PAR_DEFAUT;
+  }
+
+  onTypeChange(): void {
+    const nouveauFormData: Record<string, string> = {};
+    for (const champ of this.champsActuels) {
+      nouveauFormData[champ.key] = this.formData[champ.key] ?? '';
+    }
+    this.formData = nouveauFormData;
   }
 
   onFichiersChange(event: Event): void {
@@ -49,11 +95,7 @@ export class NouvelleDemande implements OnInit {
     this.erreur.set(null);
     this.enCours.set(true);
 
-    const infosDemandeur = JSON.stringify({
-      nom: this.nom,
-      dateNaissance: this.dateNaissance,
-      lieuNaissance: this.lieuNaissance,
-    });
+    const infosDemandeur = JSON.stringify(this.formData);
 
     this.demandeActeService.soumettre(this.typeActeId, infosDemandeur, this.fichiers).subscribe({
       next: () => this.router.navigate(['/demandes']),

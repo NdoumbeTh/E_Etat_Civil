@@ -37,15 +37,22 @@ export class TraiterDemande implements OnInit {
     });
   }
 
-  get infos(): Record<string, string> {
-    const d = this.demande();
-    if (!d) return {};
-    try {
-      return JSON.parse(d.infosDemandeur);
-    } catch {
-      return {};
-    }
+  /** Champs saisis par le citoyen, quel que soit le type d'acte (naissance/mariage/décès). */
+get infosEntries(): [string, string][] {
+  const d = this.demande();
+  if (!d) return [];
+  try {
+    const infos = JSON.parse(d.infosDemandeur) as Record<string, string>;
+    return Object.entries(infos).map(([cle, valeur]) => [this.humaniser(cle), valeur]);
+  } catch {
+    return [];
   }
+}
+
+private humaniser(cle: string): string {
+  const avecEspaces = cle.replace(/([A-Z])/g, ' $1').toLowerCase();
+  return avecEspaces.charAt(0).toUpperCase() + avecEspaces.slice(1);
+}
 
   valider(): void {
     this.decider('VALIDEE');

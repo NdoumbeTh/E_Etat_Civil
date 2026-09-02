@@ -1,0 +1,51 @@
+<div class="demande-detail">
+  @if (chargement()) {
+    <p>Chargement...</p>
+  } @else if (erreur()) {
+    <p class="erreur">{{ erreur() }}</p>
+  } @else if (demande()) {
+    <h1>Demande #{{ demande()!.id }} — {{ demande()!.typeActeLibelle }}</h1>
+
+    <p class="statut" [class]="'statut-' + demande()!.statut.toLowerCase()">
+      {{ libelleStatut(demande()!.statut) }}
+    </p>
+
+    @if (demande()!.statut === 'REJETEE' && demande()!.motifRejet) {
+      <div class="motif-rejet">
+        <strong>Motif du rejet :</strong> {{ demande()!.motifRejet }}
+      </div>
+    }
+
+    @if (demande()!.statut === 'VALIDEE') {
+      <div class="acte-info">
+        Ta demande est validée. Le téléchargement de l'acte sera disponible ici une fois le Module 3 branché.
+      </div>
+    }
+
+    <p class="date-depot">Déposée le {{ demande()!.dateDepot | date: 'dd/MM/yyyy à HH:mm' }}</p>
+
+    <section class="infos-demandeur">
+      <h2>Informations transmises</h2>
+      <ul>
+        @for (entree of infosEntries; track entree[0]) {
+          <li><strong>{{ entree[0] }}</strong> : {{ entree[1] }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="pieces">
+      <h2>Pièces jointes</h2>
+      @if (demande()!.pieces.length === 0) {
+        <p>Aucune pièce jointe.</p>
+      } @else {
+        <ul>
+          @for (piece of demande()!.pieces; track piece.id) {
+            <li><a [href]="apiOrigin + piece.url" target="_blank" rel="noopener">{{ piece.nomFichier }}</a></li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  <a routerLink="/demandes">Retour à mes demandes</a>
+</div>

@@ -3,32 +3,24 @@
 
   <form (ngSubmit)="onSubmit()">
     <label>
-      Type d'acte
-      <select name="typeActeId" [(ngModel)]="typeActeId" required>
-        @for (type of typesActes(); track type.id) {
-          <option [value]="type.id">{{ type.libelle }}</option>
-        }
-      </select>
-    </label>
+  Type d'acte
+  <select name="typeActeId" [(ngModel)]="typeActeId" (ngModelChange)="onTypeChange()" required>
+    @for (type of typesActes(); track type.id) {
+      <option [ngValue]="type.id">{{ type.libelle }}</option>
+    }
+  </select>
+</label>
 
     @if (typeSelectionne) {
       <p class="pieces-requises">Pièces requises : {{ typeSelectionne.piecesRequises }}</p>
     }
 
-    <label>
-      Nom complet du demandeur
-      <input type="text" name="nom" [(ngModel)]="nom" required />
-    </label>
-
-    <label>
-      Date de naissance
-      <input type="date" name="dateNaissance" [(ngModel)]="dateNaissance" required />
-    </label>
-
-    <label>
-      Lieu de naissance
-      <input type="text" name="lieuNaissance" [(ngModel)]="lieuNaissance" required />
-    </label>
+    @for (champ of champsActuels; track champ.key) {
+      <label>
+        {{ champ.label }}
+        <input [type]="champ.type" [name]="champ.key" [(ngModel)]="formData[champ.key]" required />
+      </label>
+    }
 
     <label>
       Pièces justificatives (PDF, images)
