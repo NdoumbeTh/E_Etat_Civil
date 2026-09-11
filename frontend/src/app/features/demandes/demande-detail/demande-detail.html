@@ -16,11 +16,14 @@
       </div>
     }
 
-    @if (demande()!.statut === 'VALIDEE') {
-      <div class="acte-info">
-        Ta demande est validée. Le téléchargement de l'acte sera disponible ici une fois le Module 3 branché.
-      </div>
-    }
+    @if (demande()!.statut === 'VALIDEE' && demande()!.urlActe) {
+    <div class="acte-pret">
+      <p>Ton acte est prêt — numéro <strong>{{ demande()!.numeroActe }}</strong>.</p>
+      <a [href]="apiOrigin + demande()!.urlActe" target="_blank" rel="noopener" class="bouton-telecharger">
+        Télécharger l'acte (PDF)
+      </a>
+    </div>
+  }
 
     <p class="date-depot">Déposée le {{ demande()!.dateDepot | date: 'dd/MM/yyyy à HH:mm' }}</p>
 

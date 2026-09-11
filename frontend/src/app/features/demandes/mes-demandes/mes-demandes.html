@@ -1,40 +1,177 @@
 <div class="mes-demandes">
+
   <header>
     <h1>Mes demandes</h1>
-    <a routerLink="/demandes/nouvelle">+ Nouvelle demande</a>
+
+    <a
+      routerLink="/demandes/nouvelle"
+      class="btn-nouvelle"
+    >
+      + Nouvelle demande
+    </a>
   </header>
 
+
   @if (chargement()) {
+
     <p>Chargement...</p>
-  } @else if (demandes().length === 0) {
+
+  }
+
+  @else if (demandes().length === 0) {
+
     <p>Aucune demande pour le moment.</p>
-  } @else {
+
+  }
+
+  @else {
+
     <table>
+
       <thead>
+
         <tr>
           <th>Type d'acte</th>
           <th>Statut</th>
           <th>Déposée le</th>
           <th>Pièces</th>
         </tr>
+
       </thead>
+
+
       <tbody>
-        @for (demande of demandes(); track demande.id) {
-          <tr [class]="'statut-' + demande.statut.toLowerCase()" [routerLink]="['/demandes', demande.id]" style="cursor: pointer;">
-            <td>{{ demande.typeActeLibelle }}</td>
+
+        @for (
+          demande of demandes();
+          track demande.id
+        ) {
+
+          <tr
+            [class]="'statut-' + demande.statut.toLowerCase()"
+            [routerLink]="['/demandes', demande.id]"
+            style="cursor: pointer;"
+          >
+
             <td>
-              {{ libelleStatut(demande.statut) }}
-              @if (demande.statut === 'REJETEE' && demande.motifRejet) {
-                <div class="motif">{{ demande.motifRejet }}</div>
-              }
+              {{ demande.typeActeLibelle }}
             </td>
-            <td>{{ demande.dateDepot | date: 'dd/MM/yyyy' }}</td>
-            <td>{{ demande.pieces.length }} fichier(s)</td>
+
+
+            <td>
+
+              {{ libelleStatut(demande.statut) }}
+
+              @if (
+                demande.statut === 'REJETEE'
+                && demande.motifRejet
+              ) {
+
+                <div class="motif">
+                  {{ demande.motifRejet }}
+                </div>
+
+              }
+
+            </td>
+
+
+            <td>
+              {{ demande.dateDepot | date:'dd/MM/yyyy' }}
+            </td>
+
+
+            <td>
+              {{ demande.pieces.length }}
+              fichier(s)
+            </td>
+
           </tr>
+
         }
+
       </tbody>
+
     </table>
+
+
+    <!-- ============================= -->
+    <!-- INFORMATIONS -->
+    <!-- ============================= -->
+
+    <div class="pagination-info">
+
+      <span>
+        {{ totalElements() }} demande(s) au total
+      </span>
+
+      <span>
+        Page {{ pageActuelle() + 1 }}
+        sur {{ totalPages() }}
+      </span>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- PAGINATION -->
+    <!-- ============================= -->
+
+    @if (totalPages() > 1) {
+
+      <div class="pagination">
+
+        <!-- PRECEDENT -->
+
+        <button
+          type="button"
+          (click)="pagePrecedente()"
+          [disabled]="pageActuelle() === 0"
+        >
+          ← Précédent
+        </button>
+
+
+        <!-- NUMEROS -->
+
+        @for (
+          page of pages();
+          track page
+        ) {
+
+          <button
+            type="button"
+            [class.active]="page === pageActuelle()"
+            (click)="allerPage(page)"
+          >
+            {{ page + 1 }}
+          </button>
+
+        }
+
+
+        <!-- SUIVANT -->
+
+        <button
+          type="button"
+          (click)="pageSuivante()"
+          [disabled]="pageActuelle() === totalPages() - 1"
+        >
+          Suivant →
+        </button>
+
+      </div>
+
+    }
+
   }
 
-  <a routerLink="/dashboard">Retour au tableau de bord</a>
+
+  <a
+    routerLink="/dashboard"
+    class="retour-dashboard"
+  >
+    ← Retour au tableau de bord
+  </a>
+
 </div>

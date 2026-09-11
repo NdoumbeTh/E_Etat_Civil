@@ -2,6 +2,9 @@ services:
   db:
     image: postgres:16-alpine
     container_name: etatcivil-db
+    env_file: .env
+    ports:
+    - "5433:5432"
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -29,12 +32,11 @@ services:
   backend:
     build: ./backend
     container_name: etatcivil-backend
-    env_file: .env
+    env_file: ./backend/.env
+    ports:
+      - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME}
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      UPLOAD_DIR: uploads
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
     depends_on:
       db:
         condition: service_healthy

@@ -18,4 +18,6 @@ export interface DemandeActe {
   motifRejet: string | null;
   dateDepot: string;
   pieces: PieceJustificative[];
+  numeroActe: string | null;
+  urlActe: string | null;
 }

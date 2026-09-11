@@ -22,6 +22,8 @@ import com.epfafrica.etatcivil.service.ActePdfService;
 import java.time.Year;
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class DemandeActeServiceImpl implements DemandeActeService {
@@ -107,21 +109,25 @@ public DemandeActeDTO traiter(Long id, TraitementRequest request) {
         return demandeActeMapper.toDTO(saved);
     }
 
-    @Override
-    public List<DemandeActeDTO> listerPourCitoyen(String emailCitoyen) {
-        Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
-                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
-        return demandeActeRepository.findByCitoyenId(citoyen.getId()).stream()
-                .map(demandeActeMapper::toDTO)
-                .toList();
-    }
+   @Override
+public Page<DemandeActeDTO> listerPourCitoyen(
+        String emailCitoyen,
+        Pageable pageable
+) {
+    Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
+            .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
+
+    return demandeActeRepository
+            .findByCitoyenId(citoyen.getId(), pageable)
+            .map(demandeActeMapper::toDTO);
+}
 
     @Override
-    public List<DemandeActeDTO> listerToutes() {
-        return demandeActeRepository.findAll().stream()
-                .map(demandeActeMapper::toDTO)
-                .toList();
-    }
+public Page<DemandeActeDTO> listerToutes(Pageable pageable) {
+    return demandeActeRepository
+            .findAll(pageable)
+            .map(demandeActeMapper::toDTO);
+}
 
     @Override
     public DemandeActeDTO obtenir(Long id, String emailDemandeur, boolean estOfficier) {

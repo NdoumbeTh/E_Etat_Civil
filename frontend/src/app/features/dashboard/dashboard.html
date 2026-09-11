@@ -1,26 +1,761 @@
 <div class="dashboard">
-  <header>
-    <h1>Tableau de bord</h1>
-    <button (click)="logout()">Déconnexion</button>
+
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+
+  <header class="dashboard-header">
+
+    <div class="dashboard-brand">
+      <div class="brand-emblem">
+        <span>e</span>
+      </div>
+
+      <div>
+        <span class="brand-country">
+          RÉPUBLIQUE DU SÉNÉGAL
+        </span>
+
+        <h1>e-ÉtatCivil</h1>
+      </div>
+    </div>
+
+    <div class="dashboard-user">
+
+      <div class="user-info">
+        <span class="user-label">Connecté en tant que</span>
+        <strong>{{ auth.role() }}</strong>
+      </div>
+
+      <button
+        type="button"
+        class="btn-logout"
+        (click)="logout()"
+      >
+        <span>↪</span>
+        Déconnexion
+      </button>
+
+    </div>
+
   </header>
 
-  @switch (auth.role()) {
-    @case ('CITOYEN') {
-  <p>Bienvenue citoyen — retrouvez ici vos demandes d'actes.</p>
-  <a routerLink="/demandes">Voir mes demandes</a>
-}
-    @case ('OFFICIER') {
-  <p>Bienvenue officier — file d'instruction des demandes.</p>
-  <a routerLink="/officier/demandes">Voir les demandes à traiter</a>
-}
-    @case ('CHEF_SERVICE') {
-      <p>Bienvenue chef de service — statistiques et délais (Module 3, Séance 5).</p>
+
+  <!-- =========================================================
+       CONTENU
+       ========================================================= -->
+
+  <main>
+
+    <!-- =======================================================
+         CITOYEN
+         ======================================================= -->
+
+    @if (auth.role() === 'CITOYEN') {
+
+      <section class="dashboard-welcome">
+
+        <div>
+          <span class="section-label">
+            ESPACE CITOYEN
+          </span>
+
+          <h2>
+            Bienvenue dans votre espace citoyen
+          </h2>
+
+          <p>
+            Gérez vos demandes d'actes d'état civil,
+            consultez leur avancement et récupérez vos documents.
+          </p>
+        </div>
+
+        <a
+          routerLink="/demandes/nouvelle"
+          class="btn-primary"
+        >
+          + Nouvelle demande
+        </a>
+
+      </section>
+
+
+      <!-- STATISTIQUES -->
+
+      <section class="stats-grid">
+
+        <div class="stat-card">
+
+          <div class="stat-icon">
+            ▣
+          </div>
+
+          <div>
+            <span>Total des demandes</span>
+            <strong>{{ totalDemandes() }}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card stat-warning">
+
+          <div class="stat-icon">
+            ◷
+          </div>
+
+          <div>
+            <span>En cours</span>
+            <strong>{{ demandesEnAttente() }}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card stat-success">
+
+          <div class="stat-icon">
+            ✓
+          </div>
+
+          <div>
+            <span>Validées</span>
+            <strong>{{ demandesValidees() }}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card stat-danger">
+
+          <div class="stat-icon">
+            !
+          </div>
+
+          <div>
+            <span>Rejetées</span>
+            <strong>{{ demandesRejetees() }}</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ACTIONS RAPIDES -->
+
+      <section class="dashboard-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-label">
+              SERVICES
+            </span>
+
+            <h2>Actions rapides</h2>
+          </div>
+
+        </div>
+
+
+        <div class="quick-actions">
+
+          <a
+            routerLink="/demandes/nouvelle"
+            class="action-card"
+          >
+            <span class="action-icon">＋</span>
+
+            <div>
+              <strong>Nouvelle demande</strong>
+              <span>Demander un acte d'état civil</span>
+            </div>
+
+            <span class="action-arrow">→</span>
+          </a>
+
+
+          <a
+            routerLink="/demandes"
+            class="action-card"
+          >
+            <span class="action-icon">▤</span>
+
+            <div>
+              <strong>Mes demandes</strong>
+              <span>Consulter toutes mes demandes</span>
+            </div>
+
+            <span class="action-arrow">→</span>
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <!-- DERNIÈRES DEMANDES -->
+
+      <section class="dashboard-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-label">
+              SUIVI
+            </span>
+
+            <h2>Dernières demandes</h2>
+          </div>
+
+          <a
+            routerLink="/demandes"
+            class="link-see-all"
+          >
+            Voir tout →
+          </a>
+
+        </div>
+
+
+        @if (chargement()) {
+
+          <div class="dashboard-empty">
+            Chargement des demandes...
+          </div>
+
+        } @else if (demandes().length === 0) {
+
+          <div class="dashboard-empty">
+
+            <div class="empty-icon">
+              ▤
+            </div>
+
+            <strong>Aucune demande</strong>
+
+            <p>
+              Vous n'avez pas encore soumis de demande.
+            </p>
+
+            <a
+              routerLink="/demandes/nouvelle"
+              class="btn-primary"
+            >
+              Créer une demande
+            </a>
+
+          </div>
+
+        } @else {
+
+          <div class="recent-list">
+
+            @for (demande of demandes().slice(0, 5); track demande.id) {
+
+              <a
+                [routerLink]="['/demandes', demande.id]"
+                class="recent-item"
+              >
+
+                <div class="recent-main">
+
+                  <strong>
+                    {{ demande.typeActeLibelle }}
+                  </strong>
+
+                  <span>
+                    Demande #{{ demande.id }}
+                  </span>
+
+                </div>
+
+
+                <div class="recent-date">
+
+                  <span>
+                    {{ demande.dateDepot | date:'dd/MM/yyyy' }}
+                  </span>
+
+                  <span
+                    class="status-badge"
+                    [class]="classeStatut(demande.statut)"
+                  >
+                    {{ libelleStatut(demande.statut) }}
+                  </span>
+
+                </div>
+
+              </a>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
     }
-    @case ('ADMIN') {
-      <p>Bienvenue admin — gestion des comptes et types d'actes.</p>
+
+
+    <!-- =======================================================
+         OFFICIER
+         ======================================================= -->
+
+    @if (auth.role() === 'OFFICIER') {
+
+      <section class="dashboard-welcome officer-welcome">
+
+        <div>
+
+          <span class="section-label">
+            ESPACE OFFICIER
+          </span>
+
+          <h2>
+            Tableau de bord de l'instruction
+          </h2>
+
+          <p>
+            Consultez les demandes d'actes d'état civil,
+            traitez les dossiers et suivez leur évolution.
+          </p>
+
+        </div>
+
+        <a
+          routerLink="/officier/demandes"
+          class="btn-primary"
+        >
+          Voir les demandes
+        </a>
+
+      </section>
+
+
+      <section class="stats-grid">
+
+        <div class="stat-card">
+
+          <div class="stat-icon">
+            ▣
+          </div>
+
+          <div>
+            <span>Total des demandes</span>
+            <strong>{{ totalDemandes() }}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card stat-warning">
+
+          <div class="stat-icon">
+            ◷
+          </div>
+
+          <div>
+            <span>À traiter</span>
+            <strong>{{ demandesEnAttente() }}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card stat-success">
+
+          <div class="stat-icon">
+            ✓
+          </div>
+
+          <div>
+            <span>Validées</span>
+            <strong>{{ demandesValidees() }}</strong>
+          </div>
+
+        </div>
+
+
+        <div class="stat-card stat-danger">
+
+          <div class="stat-icon">
+            !
+          </div>
+
+          <div>
+            <span>Rejetées</span>
+            <strong>{{ demandesRejetees() }}</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section class="dashboard-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-label">
+              INSTRUCTION
+            </span>
+
+            <h2>Actions rapides</h2>
+          </div>
+
+        </div>
+
+
+        <div class="quick-actions">
+
+          <a
+            routerLink="/officier/demandes"
+            class="action-card"
+          >
+
+            <span class="action-icon">
+              ▤
+            </span>
+
+            <div>
+              <strong>Demandes à traiter</strong>
+              <span>
+                Examiner et traiter les dossiers
+              </span>
+            </div>
+
+            <span class="action-arrow">→</span>
+
+          </a>
+
+
+          <a
+            routerLink="/officier/demandes"
+            class="action-card"
+          >
+
+            <span class="action-icon">
+              ◷
+            </span>
+
+            <div>
+              <strong>File d'instruction</strong>
+              <span>
+                Consulter les demandes en attente
+              </span>
+            </div>
+
+            <span class="action-arrow">→</span>
+
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <section class="dashboard-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-label">
+              ACTIVITÉ RÉCENTE
+            </span>
+
+            <h2>Dernières demandes reçues</h2>
+
+          </div>
+
+          <a
+            routerLink="/officier/demandes"
+            class="link-see-all"
+          >
+            Voir tout →
+          </a>
+
+        </div>
+
+
+        @if (chargement()) {
+
+          <div class="dashboard-empty">
+            Chargement...
+          </div>
+
+        } @else {
+
+          <div class="recent-list">
+
+            @for (demande of demandes().slice(0, 5); track demande.id) {
+
+              <a
+                [routerLink]="['/demandes', demande.id]"
+                class="recent-item"
+              >
+
+                <div class="recent-main">
+
+                  <strong>
+                    {{ demande.typeActeLibelle }}
+                  </strong>
+
+                  <span>
+                    Demande #{{ demande.id }}
+                  </span>
+
+                </div>
+
+
+                <div class="recent-date">
+
+                  <span>
+                    {{ demande.dateDepot | date:'dd/MM/yyyy' }}
+                  </span>
+
+                  <span
+                    class="status-badge"
+                    [class]="classeStatut(demande.statut)"
+                  >
+                    {{ libelleStatut(demande.statut) }}
+                  </span>
+
+                </div>
+
+              </a>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
     }
-    @default {
-      <p>Rôle inconnu.</p>
+
+
+    <!-- =======================================================
+         CHEF DE SERVICE
+         ======================================================= -->
+
+    @if (auth.role() === 'CHEF_SERVICE') {
+
+      <section class="dashboard-welcome">
+
+        <div>
+
+          <span class="section-label">
+            PILOTAGE
+          </span>
+
+          <h2>
+            Tableau de bord du chef de service
+          </h2>
+
+          <p>
+            Suivez l'activité du service, les délais de traitement
+            et la performance des agents.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">▣</div>
+          <div>
+            <span>Demandes reçues</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+          <div class="stat-icon">◷</div>
+          <div>
+            <span>En attente</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+        <div class="stat-card stat-success">
+          <div class="stat-icon">✓</div>
+          <div>
+            <span>Traitées</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">◴</div>
+          <div>
+            <span>Délai moyen</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+      </section>
+
+
+      <section class="dashboard-section">
+
+        <div class="section-heading">
+          <div>
+            <span class="section-label">
+              PILOTAGE
+            </span>
+
+            <h2>Indicateurs du service</h2>
+          </div>
+        </div>
+
+        <div class="dashboard-empty">
+          Les statistiques détaillées seront disponibles
+          dans le module de pilotage.
+        </div>
+
+      </section>
+
     }
-  }
+
+
+    <!-- =======================================================
+         ADMIN
+         ======================================================= -->
+
+    @if (auth.role() === 'ADMIN') {
+
+      <section class="dashboard-welcome">
+
+        <div>
+
+          <span class="section-label">
+            ADMINISTRATION
+          </span>
+
+          <h2>
+            Administration du système
+          </h2>
+
+          <p>
+            Gérez les utilisateurs, les types d'actes,
+            les paramètres et les référentiels du système.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">♙</div>
+
+          <div>
+            <span>Utilisateurs</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+
+        <div class="stat-card">
+          <div class="stat-icon">▣</div>
+
+          <div>
+            <span>Types d'actes</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+
+        <div class="stat-card stat-success">
+          <div class="stat-icon">✓</div>
+
+          <div>
+            <span>Services actifs</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+
+        <div class="stat-card">
+          <div class="stat-icon">⚙</div>
+
+          <div>
+            <span>Paramètres</span>
+            <strong>—</strong>
+          </div>
+        </div>
+
+      </section>
+
+
+      <section class="dashboard-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-label">
+              ADMINISTRATION
+            </span>
+
+            <h2>Actions rapides</h2>
+          </div>
+
+        </div>
+
+
+        <div class="quick-actions">
+
+          <div class="action-card">
+
+            <span class="action-icon">
+              ♙
+            </span>
+
+            <div>
+              <strong>Utilisateurs</strong>
+              <span>
+                Gérer les comptes utilisateurs
+              </span>
+            </div>
+
+            <span class="action-arrow">→</span>
+
+          </div>
+
+
+          <div class="action-card">
+
+            <span class="action-icon">
+              ▣
+            </span>
+
+            <div>
+              <strong>Types d'actes</strong>
+              <span>
+                Gérer les actes disponibles
+              </span>
+            </div>
+
+            <span class="action-arrow">→</span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    }
+
+  </main>
+
 </div>

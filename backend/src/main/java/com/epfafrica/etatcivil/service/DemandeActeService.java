@@ -2,20 +2,38 @@ package com.epfafrica.etatcivil.service;
 
 import com.epfafrica.etatcivil.dto.DemandeActeDTO;
 import com.epfafrica.etatcivil.dto.TraitementRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface DemandeActeService {
 
-    DemandeActeDTO soumettre(String emailCitoyen, Long typeActeId, String infosDemandeur, List<MultipartFile> pieces);
+    DemandeActeDTO soumettre(
+            String emailCitoyen,
+            Long typeActeId,
+            String infosDemandeur,
+            List<MultipartFile> pieces
+    );
 
-    /** RG-04 : un CITOYEN ne consulte que ses propres demandes. */
-    List<DemandeActeDTO> listerPourCitoyen(String emailCitoyen);
+    Page<DemandeActeDTO> listerPourCitoyen(
+            String emailCitoyen,
+            Pageable pageable
+    );
 
-    List<DemandeActeDTO> listerToutes();
+    Page<DemandeActeDTO> listerToutes(
+            Pageable pageable
+    );
 
-    DemandeActeDTO obtenir(Long id, String emailDemandeur, boolean estOfficier);
+    DemandeActeDTO obtenir(
+            Long id,
+            String emailDemandeur,
+            boolean estOfficier
+    );
 
-    DemandeActeDTO traiter(Long id, TraitementRequest request);
+    DemandeActeDTO traiter(
+            Long id,
+            TraitementRequest request
+    );
 }
