@@ -32,6 +32,9 @@
     @if (demande()!.statut === 'DEPOSEE' || demande()!.statut === 'EN_TRAITEMENT') {
       <section class="decision">
         <h2>Décision</h2>
+        <button type="button" class="btn-apercu" (click)="previsualiserActe()" [disabled]="chargementApercu()">
+  {{ chargementApercu() ? "Génération de l'aperçu..." : "👁 Prévisualiser l'acte" }}
+</button>
         <button type="button" (click)="valider()" [disabled]="enCours()">Valider la demande</button>
 
         <div class="rejet">

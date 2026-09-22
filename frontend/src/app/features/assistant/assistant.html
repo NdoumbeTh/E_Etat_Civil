@@ -1,0 +1,31 @@
+<div class="assistant-page">
+  <header>
+    <h1>Assistant virtuel</h1>
+    <a routerLink="/dashboard">Retour au tableau de bord</a>
+  </header>
+
+  <div class="zone-messages" #zoneMessages>
+    @for (message of messages(); track $index) {
+      <div class="message" [class]="'message-' + message.role">
+        <p>{{ message.texte }}</p>
+      </div>
+    }
+    @if (enCours()) {
+      <div class="message message-assistant message-chargement">
+        <p>L'assistant réfléchit...</p>
+      </div>
+    }
+  </div>
+
+  <form (ngSubmit)="envoyer()" class="zone-saisie">
+    <input
+      type="text"
+      name="message"
+      [(ngModel)]="saisie"
+      placeholder="Pose ta question (ex : quelles pièces pour un acte de naissance ?)"
+      autocomplete="off"
+      [disabled]="enCours()"
+    />
+    <button type="submit" [disabled]="enCours() || !saisie.trim()">Envoyer</button>
+  </form>
+</div>

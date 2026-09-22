@@ -19,6 +19,8 @@ export class TraiterDemande implements OnInit {
   erreur = signal<string | null>(null);
   motif = '';
   apiOrigin = environment.apiUrl.replace(/\/api$/, '');
+  chargementApercu = signal(false);
+
 
   constructor(
     private route: ActivatedRoute,
@@ -47,6 +49,24 @@ get infosEntries(): [string, string][] {
   } catch {
     return [];
   }
+}
+previsualiserActe(): void {
+  const d = this.demande();
+  if (!d) return;
+  this.erreur.set(null);
+  this.chargementApercu.set(true);
+
+  this.demandeActeService.apercuActe(d.id).subscribe({
+    next: (blob) => {
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      this.chargementApercu.set(false);
+    },
+    error: () => {
+      this.erreur.set("Impossible de générer l'aperçu de l'acte.");
+      this.chargementApercu.set(false);
+    },
+  });
 }
 
 private humaniser(cle: string): string {

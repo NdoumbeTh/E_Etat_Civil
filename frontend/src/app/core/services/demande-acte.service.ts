@@ -91,4 +91,10 @@ export class DemandeActeService {
       `${environment.apiUrl}/demandes-actes/${id}`
     );
   }
+
+  apercuActe(id: number): Observable<Blob> {
+  return this.http.get(`${environment.apiUrl}/demandes-actes/${id}/apercu-acte`, {
+    responseType: 'blob',
+  });
+}
 }

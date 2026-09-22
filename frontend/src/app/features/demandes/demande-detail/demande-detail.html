@@ -17,13 +17,13 @@
     }
 
     @if (demande()!.statut === 'VALIDEE' && demande()!.urlActe) {
-    <div class="acte-pret">
-      <p>Ton acte est prêt — numéro <strong>{{ demande()!.numeroActe }}</strong>.</p>
-      <a [href]="apiOrigin + demande()!.urlActe" target="_blank" rel="noopener" class="bouton-telecharger">
-        Télécharger l'acte (PDF)
-      </a>
-    </div>
-  }
+  <div class="acte-pret">
+    <p>Ton acte est prêt — numéro <strong>{{ demande()!.numeroActe }}</strong>.</p>
+    <a [href]="apiOrigin + demande()!.urlActe" target="_blank" rel="noopener" class="btn btn-primary btn-telecharger">
+      ⬇ Télécharger l'acte (PDF)
+    </a>
+  </div>
+}
 
     <p class="date-depot">Déposée le {{ demande()!.dateDepot | date: 'dd/MM/yyyy à HH:mm' }}</p>
 

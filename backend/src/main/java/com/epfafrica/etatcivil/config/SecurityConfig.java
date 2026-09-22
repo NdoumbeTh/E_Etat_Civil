@@ -40,11 +40,12 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/api/health", "/uploads/**", "/actes/**").permitAll()
+            .requestMatchers("/api/auth/**", "/api/health", "/uploads/**", "/actes/**", "/actuator/health/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/types-actes/**").authenticated()
             .requestMatchers("/api/types-actes/**").hasRole("ADMIN")
             .requestMatchers("/api/demandes-actes/**").hasAnyRole("CITOYEN", "OFFICIER")
             .requestMatchers("/api/assistant").hasRole("CITOYEN")
+            .requestMatchers("/api/stats/**").hasRole("CHEF_SERVICE")
             .anyRequest().authenticated()
         )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

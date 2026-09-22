@@ -119,6 +119,21 @@ public class DemandeActeController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping(value = "/{id}/apercu-acte", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> apercuActe(Authentication auth, @PathVariable Long id) {
+        if (!estOfficier(auth)) {
+            return ResponseEntity.status(403).build();
+        }
+        try {
+            byte[] pdf = demandeActeService.genererApercuActe(id);
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=apercu-acte.pdf")
+                    .body(pdf);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     private boolean estOfficier(Authentication auth) {
         return auth.getAuthorities().contains(

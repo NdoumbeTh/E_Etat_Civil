@@ -9,13 +9,24 @@ import { TypeActe } from '../../../core/models/demande-acte.model';
 interface ChampFormulaire {
   key: string;
   label: string;
-  type: 'text' | 'date';
+  type: 'text' | 'date' | 'time' | 'select';
+  options?: { valeur: string; libelle: string }[];
 }
 
 const CHAMPS_PAR_TYPE: Record<string, ChampFormulaire[]> = {
   NAISSANCE: [
     { key: 'nomEnfant', label: "Nom complet de l'enfant", type: 'text' },
     { key: 'dateNaissance', label: 'Date de naissance', type: 'date' },
+    { key: 'heureNaissance', label: 'Heure de naissance', type: 'time' },
+    {
+      key: 'sexe',
+      label: "Sexe de l'enfant",
+      type: 'select',
+      options: [
+        { valeur: 'M', libelle: 'Masculin' },
+        { valeur: 'F', libelle: 'Féminin' },
+      ],
+    },
     { key: 'lieuNaissance', label: 'Lieu de naissance', type: 'text' },
     { key: 'nomPere', label: 'Nom du père', type: 'text' },
     { key: 'nomMere', label: 'Nom de la mère', type: 'text' },
@@ -25,11 +36,21 @@ const CHAMPS_PAR_TYPE: Record<string, ChampFormulaire[]> = {
     { key: 'nomEpouse', label: "Nom complet de l'épouse", type: 'text' },
     { key: 'dateMariage', label: 'Date du mariage', type: 'date' },
     { key: 'lieuMariage', label: 'Lieu du mariage', type: 'text' },
+    {
+      key: 'regimeMatrimonial',
+      label: 'Régime matrimonial',
+      type: 'select',
+      options: [
+        { valeur: 'séparation des biens', libelle: 'Séparation des biens' },
+        { valeur: 'communauté des biens', libelle: 'Communauté des biens' },
+      ],
+    },
   ],
   DECES: [
     { key: 'nomDefunt', label: 'Nom complet du défunt', type: 'text' },
+    { key: 'dateNaissanceDefunt', label: 'Date de naissance du défunt', type: 'date' },
     { key: 'dateDeces', label: 'Date du décès', type: 'date' },
-    { key: 'lieuDeces', label: 'Lieu du décès', type: 'text' },
+    { key: 'lieuDeces', label: 'Lieu du décès (commune)', type: 'text' },
     { key: 'nomDeclarant', label: 'Nom du déclarant', type: 'text' },
   ],
 };

@@ -41,5 +41,10 @@ export const routes: Routes = [
   loadComponent: () => import('./features/demandes/demande-detail/demande-detail').then((m) => m.DemandeDetail),
   canActivate: [authGuard],
 },
+{
+  path: 'assistant',
+  loadComponent: () => import('./features/assistant/assistant').then((m) => m.Assistant),
+  canActivate: [authGuard],
+},
   { path: '**', redirectTo: 'login' },
 ];

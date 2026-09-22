@@ -36,4 +36,6 @@ public interface DemandeActeService {
             Long id,
             TraitementRequest request
     );
+    /** Génère un aperçu PDF de l'acte sans le persister ni modifier le statut (contrôle avant validation). */
+byte[] genererApercuActe(Long id);
 }

@@ -189,6 +189,14 @@
 
             <span class="action-arrow">→</span>
           </a>
+          <a routerLink="/assistant" class="action-card">
+  <span class="action-icon">💬</span>
+  <div>
+    <strong>Assistant virtuel</strong>
+    <span>Poser une question sur mes démarches</span>
+  </div>
+  <span class="action-arrow">→</span>
+</a>
 
         </div>
 
@@ -545,85 +553,101 @@
 
     @if (auth.role() === 'CHEF_SERVICE') {
 
-      <section class="dashboard-welcome">
+  <section class="dashboard-welcome">
+    <div>
+      <span class="section-label">PILOTAGE</span>
+      <h2>Tableau de bord du chef de service</h2>
+      <p>
+        Suivez l'activité du service, les délais de traitement
+        et la répartition des demandes par type d'acte.
+      </p>
+    </div>
+  </section>
 
+  @if (chargement()) {
+
+    <div class="dashboard-empty">
+      Chargement des statistiques...
+    </div>
+
+  } @else if (!statsChef()) {
+
+    <div class="dashboard-empty">
+      Impossible de charger les statistiques.
+    </div>
+
+  } @else {
+
+    <section class="stats-grid">
+
+      <div class="stat-card">
+        <div class="stat-icon">▣</div>
         <div>
-
-          <span class="section-label">
-            PILOTAGE
-          </span>
-
-          <h2>
-            Tableau de bord du chef de service
-          </h2>
-
-          <p>
-            Suivez l'activité du service, les délais de traitement
-            et la performance des agents.
-          </p>
-
+          <span>Demandes reçues</span>
+          <strong>{{ statsChef()!.total }}</strong>
         </div>
+      </div>
 
-      </section>
-
-
-      <section class="stats-grid">
-
-        <div class="stat-card">
-          <div class="stat-icon">▣</div>
-          <div>
-            <span>Demandes reçues</span>
-            <strong>—</strong>
-          </div>
+      <div class="stat-card stat-warning">
+        <div class="stat-icon">◷</div>
+        <div>
+          <span>En attente</span>
+          <strong>{{ statsChef()!.deposees + statsChef()!.enTraitement }}</strong>
         </div>
+      </div>
 
-        <div class="stat-card stat-warning">
-          <div class="stat-icon">◷</div>
-          <div>
-            <span>En attente</span>
-            <strong>—</strong>
-          </div>
+      <div class="stat-card stat-success">
+        <div class="stat-icon">✓</div>
+        <div>
+          <span>Traitées</span>
+          <strong>{{ statsChef()!.validees + statsChef()!.rejetees }}</strong>
         </div>
+      </div>
 
-        <div class="stat-card stat-success">
-          <div class="stat-icon">✓</div>
-          <div>
-            <span>Traitées</span>
-            <strong>—</strong>
-          </div>
+      <div class="stat-card">
+        <div class="stat-icon">◴</div>
+        <div>
+          <span>Délai moyen</span>
+          <strong>{{ formatDelai(statsChef()!.delaiMoyenTraitementHeures) }}</strong>
         </div>
+      </div>
 
-        <div class="stat-card">
-          <div class="stat-icon">◴</div>
-          <div>
-            <span>Délai moyen</span>
-            <strong>—</strong>
-          </div>
+    </section>
+
+
+    <section class="dashboard-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-label">PILOTAGE</span>
+          <h2>Répartition par type d'acte</h2>
         </div>
+      </div>
 
-      </section>
-
-
-      <section class="dashboard-section">
-
-        <div class="section-heading">
-          <div>
-            <span class="section-label">
-              PILOTAGE
-            </span>
-
-            <h2>Indicateurs du service</h2>
-          </div>
-        </div>
-
+      @if (parTypeEntries.length === 0) {
         <div class="dashboard-empty">
-          Les statistiques détaillées seront disponibles
-          dans le module de pilotage.
+          Aucune demande enregistrée pour le moment.
         </div>
+      } @else {
+        <div class="recent-list">
+          @for (entree of parTypeEntries; track entree[0]) {
+            <div class="recent-item">
+              <div class="recent-main">
+                <strong>{{ entree[0] }}</strong>
+              </div>
+              <div class="recent-date">
+                <span>{{ entree[1] }} demande(s)</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
 
-      </section>
+    </section>
 
-    }
+  }
+
+}
 
 
     <!-- =======================================================

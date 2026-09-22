@@ -40,6 +40,8 @@ public class DemandeActe {
 
     @Column(nullable = false)
     private LocalDateTime dateDepot = LocalDateTime.now();
+    /** Renseignée au moment du traitement (validation/rejet) ; sert au calcul du délai. */
+    private LocalDateTime dateTraitement;
 
     @OneToMany(mappedBy = "demandeActe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PieceJustificative> pieces = new ArrayList<>();
@@ -50,14 +52,16 @@ public class DemandeActe {
     // -- Comportement métier minimal, à enrichir en service --
 
     public void valider() {
-        this.statut = StatutDemande.VALIDEE;
-    }
+    this.statut = StatutDemande.VALIDEE;
+    this.dateTraitement = LocalDateTime.now();
+}
 
-    public void rejeter(String motif) {
-        if (motif == null || motif.isBlank()) {
-            throw new IllegalArgumentException("Le motif de rejet est obligatoire (RG-05).");
-        }
-        this.statut = StatutDemande.REJETEE;
-        this.motifRejet = motif;
+public void rejeter(String motif) {
+    if (motif == null || motif.isBlank()) {
+        throw new IllegalArgumentException("Le motif de rejet est obligatoire (RG-05).");
     }
+    this.statut = StatutDemande.REJETEE;
+    this.motifRejet = motif;
+    this.dateTraitement = LocalDateTime.now();
+}
 }

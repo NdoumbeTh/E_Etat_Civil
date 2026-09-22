@@ -16,11 +16,20 @@
     }
 
     @for (champ of champsActuels; track champ.key) {
-      <label>
-        {{ champ.label }}
+    <label>
+      {{ champ.label }}
+      @if (champ.type === 'select') {
+        <select [name]="champ.key" [(ngModel)]="formData[champ.key]" required>
+          <option value="" disabled selected>Choisir...</option>
+          @for (option of champ.options; track option.valeur) {
+            <option [ngValue]="option.valeur">{{ option.libelle }}</option>
+          }
+        </select>
+      } @else {
         <input [type]="champ.type" [name]="champ.key" [(ngModel)]="formData[champ.key]" required />
-      </label>
-    }
+      }
+    </label>
+  }
 
     <label>
       Pièces justificatives (PDF, images)

@@ -2,9 +2,6 @@ services:
   db:
     image: postgres:16-alpine
     container_name: etatcivil-db
-    env_file: .env
-    ports:
-    - "5433:5432"
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -19,27 +16,29 @@ services:
     networks:
       - etatcivil-net
 
-  # ollama : service prévu pour l'assistant conversationnel (Spring AI),
-  # pas encore intégré côté backend -> à réactiver dès qu'il sera consommé par l'app.
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   container_name: etatcivil-ollama
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #   networks:
-  #     - etatcivil-net
+  ollama:
+    image: ollama/ollama:latest
+    container_name: etatcivil-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - etatcivil-net
 
   backend:
     build: ./backend
     container_name: etatcivil-backend
-    env_file: ./backend/.env
-    ports:
-      - "8080:8080"
+    env_file: .env
     environment:
-      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      UPLOAD_DIR: uploads
+      OLLAMA_BASE_URL: http://ollama:11434
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_started
     volumes:
       - backend_uploads:/app/uploads
     networks:
@@ -62,4 +61,4 @@ networks:
 volumes:
   db_data:
   backend_uploads:
-  # ollama_data: # à réactiver avec le service ollama
+  ollama_data:

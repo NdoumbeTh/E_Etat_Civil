@@ -12,18 +12,15 @@ import com.epfafrica.etatcivil.notification.NotificationService;
 import com.epfafrica.etatcivil.repository.DemandeActeRepository;
 import com.epfafrica.etatcivil.repository.TypeActeRepository;
 import com.epfafrica.etatcivil.repository.UtilisateurRepository;
+import com.epfafrica.etatcivil.service.ActePdfService;
 import com.epfafrica.etatcivil.service.DemandeActeService;
 import com.epfafrica.etatcivil.storage.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.epfafrica.etatcivil.model.ActeDelivre;
-import com.epfafrica.etatcivil.service.ActePdfService;
 import java.time.Year;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @Service
 public class DemandeActeServiceImpl implements DemandeActeService {
@@ -41,7 +38,8 @@ public class DemandeActeServiceImpl implements DemandeActeService {
                                    UtilisateurRepository utilisateurRepository,
                                    FileStorageService fileStorageService,
                                    NotificationService notificationService,
-                                   DemandeActeMapper demandeActeMapper, ActePdfService actePdfService) {
+                                   DemandeActeMapper demandeActeMapper,
+                                   ActePdfService actePdfService) {
         this.demandeActeRepository = demandeActeRepository;
         this.typeActeRepository = typeActeRepository;
         this.utilisateurRepository = utilisateurRepository;
@@ -52,34 +50,49 @@ public class DemandeActeServiceImpl implements DemandeActeService {
     }
 
     @Override
-public DemandeActeDTO traiter(Long id, TraitementRequest request) {
-    DemandeActe demande = demandeActeRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
+    public DemandeActeDTO traiter(Long id, TraitementRequest request) {
+        DemandeActe demande = demandeActeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
 
-    if (request.decision() == TraitementRequest.Decision.VALIDEE) {
-        demande.valider();
+        if (request.decision() == TraitementRequest.Decision.VALIDEE) {
+            demande.valider();
 
-        if (demande.getActeDelivre() == null) { // RG-06 : jamais régénérer
-            String prefixe = demande.getTypeActe().getLibelle();
-            prefixe = prefixe.length() >= 3 ? prefixe.substring(0, 3) : prefixe;
-            String numeroUnique = prefixe + "-" + Year.now() + "-" + String.format("%06d", demande.getId());
+            if (demande.getActeDelivre() == null) {
+                String numeroUnique = genererNumeroUnique(demande);
+                String cheminPdf = actePdfService.genererPdf(demande, numeroUnique);
 
-            String cheminPdf = actePdfService.genererPdf(demande, numeroUnique);
-
-            ActeDelivre acte = new ActeDelivre();
-            acte.setDemandeActe(demande);
-            acte.setNumeroUnique(numeroUnique);
-            acte.setCheminFichierPdf(cheminPdf);
-            demande.setActeDelivre(acte);
+                ActeDelivre acte = new ActeDelivre();
+                acte.setDemandeActe(demande);
+                acte.setNumeroUnique(numeroUnique);
+                acte.setCheminFichierPdf(cheminPdf);
+                demande.setActeDelivre(acte);
+            }
+        } else {
+            demande.rejeter(request.motif());
         }
-    } else {
-        demande.rejeter(request.motif());
+
+        DemandeActe saved = demandeActeRepository.save(demande);
+        notificationService.notifierChangementStatut(saved);
+        return demandeActeMapper.toDTO(saved);
     }
 
-    DemandeActe saved = demandeActeRepository.save(demande);
-    notificationService.notifierChangementStatut(saved);
-    return demandeActeMapper.toDTO(saved);
-}
+    @Override
+    public byte[] genererApercuActe(Long id) {
+        DemandeActe demande = demandeActeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
+
+        String numero = demande.getActeDelivre() != null
+                ? demande.getActeDelivre().getNumeroUnique()
+                : genererNumeroUnique(demande);
+
+        return actePdfService.genererApercu(demande, numero);
+    }
+
+    private String genererNumeroUnique(DemandeActe demande) {
+        String prefixe = demande.getTypeActe().getLibelle();
+        prefixe = prefixe.length() >= 3 ? prefixe.substring(0, 3) : prefixe;
+        return prefixe + "-" + Year.now() + "-" + String.format("%06d", demande.getId());
+    }
 
     @Override
     public DemandeActeDTO soumettre(String emailCitoyen, Long typeActeId, String infosDemandeur, List<MultipartFile> pieces) {
@@ -109,25 +122,21 @@ public DemandeActeDTO traiter(Long id, TraitementRequest request) {
         return demandeActeMapper.toDTO(saved);
     }
 
-   @Override
-public Page<DemandeActeDTO> listerPourCitoyen(
-        String emailCitoyen,
-        Pageable pageable
-) {
-    Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
-            .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
-
-    return demandeActeRepository
-            .findByCitoyenId(citoyen.getId(), pageable)
-            .map(demandeActeMapper::toDTO);
-}
+    @Override
+    public List<DemandeActeDTO> listerPourCitoyen(String emailCitoyen) {
+        Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
+        return demandeActeRepository.findByCitoyenId(citoyen.getId()).stream()
+                .map(demandeActeMapper::toDTO)
+                .toList();
+    }
 
     @Override
-public Page<DemandeActeDTO> listerToutes(Pageable pageable) {
-    return demandeActeRepository
-            .findAll(pageable)
-            .map(demandeActeMapper::toDTO);
-}
+    public List<DemandeActeDTO> listerToutes() {
+        return demandeActeRepository.findAll().stream()
+                .map(demandeActeMapper::toDTO)
+                .toList();
+    }
 
     @Override
     public DemandeActeDTO obtenir(Long id, String emailDemandeur, boolean estOfficier) {
