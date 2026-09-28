@@ -30,6 +30,11 @@ spring:
       max-file-size: ${MAX_FILE_SIZE:10MB}
       max-request-size: ${MAX_REQUEST_SIZE:20MB}
 
+management:
+  health:
+    mail:
+      enabled: false
+
 app:
   jwt:
     secret: ${JWT_SECRET:change-this-secret-in-a-real-env-min-32-chars-long}

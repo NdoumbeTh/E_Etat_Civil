@@ -43,6 +43,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    // Actuator (health checks pour Kubernetes)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     // Mail (notifications RG-05)
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 

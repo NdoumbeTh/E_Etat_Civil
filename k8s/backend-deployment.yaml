@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ndoumbe234/e-etatcivil-backend:v1.0.0
+          image: etatcivil-backend:local
+          imagePullPolicy: Never
           ports:
             - containerPort: 8080
           envFrom:

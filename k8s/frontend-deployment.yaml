@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ndoumbe234/e-etatcivil-frontend:v1.0.0
+          image: etatcivil-frontend:local
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           readinessProbe:
