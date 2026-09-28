@@ -15,6 +15,8 @@ import com.epfafrica.etatcivil.repository.UtilisateurRepository;
 import com.epfafrica.etatcivil.service.ActePdfService;
 import com.epfafrica.etatcivil.service.DemandeActeService;
 import com.epfafrica.etatcivil.storage.FileStorageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +52,60 @@ public class DemandeActeServiceImpl implements DemandeActeService {
     }
 
     @Override
+    public DemandeActeDTO soumettre(String emailCitoyen, Long typeActeId, String infosDemandeur, List<MultipartFile> pieces) {
+        Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
+        TypeActe typeActe = typeActeRepository.findById(typeActeId)
+                .orElseThrow(() -> new NoSuchElementException("Type d'acte introuvable"));
+
+        DemandeActe demande = new DemandeActe();
+        demande.setCitoyen(citoyen);
+        demande.setTypeActe(typeActe);
+        demande.setInfosDemandeur(infosDemandeur);
+
+        if (pieces != null) {
+            for (MultipartFile file : pieces) {
+                if (file.isEmpty()) continue;
+                String url = fileStorageService.store(file);
+                PieceJustificative piece = new PieceJustificative();
+                piece.setDemandeActe(demande);
+                piece.setNomFichier(file.getOriginalFilename());
+                piece.setUrl(url);
+                demande.getPieces().add(piece);
+            }
+        }
+
+        DemandeActe saved = demandeActeRepository.save(demande);
+        return demandeActeMapper.toDTO(saved);
+    }
+
+    /** RG-04 : un CITOYEN ne consulte que ses propres demandes. */
+    @Override
+    public Page<DemandeActeDTO> listerPourCitoyen(String emailCitoyen, Pageable pageable) {
+        Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
+                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
+        return demandeActeRepository.findByCitoyenId(citoyen.getId(), pageable)
+                .map(demandeActeMapper::toDTO);
+    }
+
+    @Override
+    public Page<DemandeActeDTO> listerToutes(Pageable pageable) {
+        return demandeActeRepository.findAll(pageable)
+                .map(demandeActeMapper::toDTO);
+    }
+
+    @Override
+    public DemandeActeDTO obtenir(Long id, String emailDemandeur, boolean estOfficier) {
+        DemandeActe demande = demandeActeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
+
+        if (!estOfficier && !demande.getCitoyen().getEmail().equals(emailDemandeur)) {
+            throw new SecurityException("Accès refusé à cette demande");
+        }
+        return demandeActeMapper.toDTO(demande);
+    }
+
+    @Override
     public DemandeActeDTO traiter(Long id, TraitementRequest request) {
         DemandeActe demande = demandeActeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
@@ -57,7 +113,7 @@ public class DemandeActeServiceImpl implements DemandeActeService {
         if (request.decision() == TraitementRequest.Decision.VALIDEE) {
             demande.valider();
 
-            if (demande.getActeDelivre() == null) {
+            if (demande.getActeDelivre() == null) { // RG-06 : jamais régénérer
                 String numeroUnique = genererNumeroUnique(demande);
                 String cheminPdf = actePdfService.genererPdf(demande, numeroUnique);
 
@@ -88,64 +144,10 @@ public class DemandeActeServiceImpl implements DemandeActeService {
         return actePdfService.genererApercu(demande, numero);
     }
 
+    /** Même formule à la validation et à l'aperçu, pour que le numéro affiché ne change pas. */
     private String genererNumeroUnique(DemandeActe demande) {
         String prefixe = demande.getTypeActe().getLibelle();
         prefixe = prefixe.length() >= 3 ? prefixe.substring(0, 3) : prefixe;
         return prefixe + "-" + Year.now() + "-" + String.format("%06d", demande.getId());
-    }
-
-    @Override
-    public DemandeActeDTO soumettre(String emailCitoyen, Long typeActeId, String infosDemandeur, List<MultipartFile> pieces) {
-        Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
-                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
-        TypeActe typeActe = typeActeRepository.findById(typeActeId)
-                .orElseThrow(() -> new NoSuchElementException("Type d'acte introuvable"));
-
-        DemandeActe demande = new DemandeActe();
-        demande.setCitoyen(citoyen);
-        demande.setTypeActe(typeActe);
-        demande.setInfosDemandeur(infosDemandeur);
-
-        if (pieces != null) {
-            for (MultipartFile file : pieces) {
-                if (file.isEmpty()) continue;
-                String url = fileStorageService.store(file);
-                PieceJustificative piece = new PieceJustificative();
-                piece.setDemandeActe(demande);
-                piece.setNomFichier(file.getOriginalFilename());
-                piece.setUrl(url);
-                demande.getPieces().add(piece);
-            }
-        }
-
-        DemandeActe saved = demandeActeRepository.save(demande);
-        return demandeActeMapper.toDTO(saved);
-    }
-
-    @Override
-    public List<DemandeActeDTO> listerPourCitoyen(String emailCitoyen) {
-        Utilisateur citoyen = utilisateurRepository.findByEmail(emailCitoyen)
-                .orElseThrow(() -> new NoSuchElementException("Utilisateur introuvable"));
-        return demandeActeRepository.findByCitoyenId(citoyen.getId()).stream()
-                .map(demandeActeMapper::toDTO)
-                .toList();
-    }
-
-    @Override
-    public List<DemandeActeDTO> listerToutes() {
-        return demandeActeRepository.findAll().stream()
-                .map(demandeActeMapper::toDTO)
-                .toList();
-    }
-
-    @Override
-    public DemandeActeDTO obtenir(Long id, String emailDemandeur, boolean estOfficier) {
-        DemandeActe demande = demandeActeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Demande introuvable"));
-
-        if (!estOfficier && !demande.getCitoyen().getEmail().equals(emailDemandeur)) {
-            throw new SecurityException("Accès refusé à cette demande");
-        }
-        return demandeActeMapper.toDTO(demande);
     }
 }

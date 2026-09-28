@@ -4,6 +4,7 @@ import com.epfafrica.etatcivil.dto.AssistantRequest;
 import com.epfafrica.etatcivil.dto.AssistantResponse;
 import com.epfafrica.etatcivil.service.AssistantService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +21,9 @@ public class AssistantController {
     }
 
     @PostMapping
-    public AssistantResponse poserQuestion(@Valid @RequestBody AssistantRequest request) {
-        String reponse = assistantService.repondre(request.message());
+    public AssistantResponse poserQuestion(Authentication auth,
+                                           @Valid @RequestBody AssistantRequest request) {
+        String reponse = assistantService.repondre(auth.getName(), request.message());
         return new AssistantResponse(reponse);
     }
 }

@@ -1,9 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AssistantWidget } from './features/assistant/assistant-widget';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, AssistantWidget],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
