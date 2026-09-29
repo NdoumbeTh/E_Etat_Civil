@@ -1,0 +1,44 @@
+name: Build et push des images vers ACR
+
+# Se déclenche automatiquement à chaque push sur main,
+# ou manuellement depuis l'onglet Actions de GitHub
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  ACR_NAME: eetatcivilacr
+  ACR_LOGIN_SERVER: eetatcivilacr.azurecr.io
+  IMAGE_TAG: v1.0.1
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupère le code du dépôt sur la machine de build GitHub
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      # Se connecte à Azure avec l'identifiant technique créé plus tôt
+      - name: Connexion à Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Se connecte au registre ACR pour pouvoir y pousser les images
+      - name: Connexion à ACR
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      # Construit l'image du backend (Spring Boot) et la pousse vers ACR
+      - name: Build et push backend
+        run: |
+          docker build -t ${{ env.ACR_LOGIN_SERVER }}/etatcivil-backend:${{ env.IMAGE_TAG }} ./backend
+          docker push ${{ env.ACR_LOGIN_SERVER }}/etatcivil-backend:${{ env.IMAGE_TAG }}
+
+      # Construit l'image du frontend (Angular) et la pousse vers ACR
+      - name: Build et push frontend
+        run: |
+          docker build -t ${{ env.ACR_LOGIN_SERVER }}/etatcivil-frontend:${{ env.IMAGE_TAG }} ./frontend
+          docker push ${{ env.ACR_LOGIN_SERVER }}/etatcivil-frontend:${{ env.IMAGE_TAG }}
