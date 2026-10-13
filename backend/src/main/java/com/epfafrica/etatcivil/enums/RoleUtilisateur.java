@@ -4,5 +4,6 @@ public enum RoleUtilisateur {
     CITOYEN,
     OFFICIER,
     CHEF_SERVICE,
-    ADMIN
+    ADMIN,
+    TEST
 }
